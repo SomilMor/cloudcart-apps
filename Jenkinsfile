@@ -1,41 +1,70 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            label 'kaniko'
+        }
+    }
+
+    environment {
+        DOCKERHUB_USERNAME = "somil7"
+    }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Order Service') {
+        stage('Build & Push Order Service') {
             steps {
-                dir('order-service') {
-                    sh 'docker build -t somil7/order-service:latest .'
+                container('kaniko') {
+                    sh '''
+                    /kaniko/executor \
+                    --context=$WORKSPACE/order-service \
+                    --dockerfile=$WORKSPACE/order-service/Dockerfile \
+                    --destination=$DOCKERHUB_USERNAME/order-service:latest
+                    '''
                 }
             }
         }
 
-        stage('Build Payment Service') {
+        stage('Build & Push Payment Service') {
             steps {
-                dir('payment-service') {
-                    sh 'docker build -t somil7/payment-service:latest .'
+                container('kaniko') {
+                    sh '''
+                    /kaniko/executor \
+                    --context=$WORKSPACE/payment-service \
+                    --dockerfile=$WORKSPACE/payment-service/Dockerfile \
+                    --destination=$DOCKERHUB_USERNAME/payment-service:latest
+                    '''
                 }
             }
         }
 
-        stage('Build Product Service') {
+        stage('Build & Push Product Service') {
             steps {
-                dir('product-service') {
-                    sh 'docker build -t somil7/product-service:latest .'
+                container('kaniko') {
+                    sh '''
+                    /kaniko/executor \
+                    --context=$WORKSPACE/product-service \
+                    --dockerfile=$WORKSPACE/product-service/Dockerfile \
+                    --destination=$DOCKERHUB_USERNAME/product-service:latest
+                    '''
                 }
             }
         }
 
-        stage('Build User Service') {
+        stage('Build & Push User Service') {
             steps {
-                dir('user-service') {
-                    sh 'docker build -t somil7/user-service:latest .'
+                container('kaniko') {
+                    sh '''
+                    /kaniko/executor \
+                    --context=$WORKSPACE/user-service \
+                    --dockerfile=$WORKSPACE/user-service/Dockerfile \
+                    --destination=$DOCKERHUB_USERNAME/user-service:latest
+                    '''
                 }
             }
         }
