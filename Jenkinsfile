@@ -1,9 +1,10 @@
 pipeline {
     agent {
-        kubernetes {
-            label 'kaniko'
-        }
+    kubernetes {
+        inheritFrom 'kaniko'
+        defaultContainer 'jnlp'
     }
+}
 
     environment {
         DOCKERHUB_USERNAME = "somil7"
