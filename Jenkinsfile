@@ -26,6 +26,7 @@ pipeline {
                     --context=$WORKSPACE/order-service \
                     --dockerfile=$WORKSPACE/order-service/Dockerfile \
                     --destination=$DOCKERHUB_USERNAME/order-service:latest
+                    --verbosity=debug
                     '''
                 }
             }
