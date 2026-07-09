@@ -17,6 +17,32 @@ pipeline {
             }
         }
 
+        stage('Debug Workspace') {
+            steps {
+                container('kaniko') {
+                    sh '''
+                    echo "===== PWD ====="
+                    pwd
+
+                    echo "===== WORKSPACE ====="
+                    echo $WORKSPACE
+
+                    echo "===== ROOT ====="
+                    ls -la $WORKSPACE
+
+                    echo "===== ORDER SERVICE ====="
+                    ls -la $WORKSPACE/order-service
+
+                    echo "===== PACKAGE.JSON ====="
+                    cat $WORKSPACE/order-service/package.json
+
+                    echo "===== DOCKERFILE ====="
+                    cat $WORKSPACE/order-service/Dockerfile
+                    '''
+                }
+            }
+        }
+
         stage('Build & Push Order Service') {
             steps {
                 container('kaniko') {
@@ -25,27 +51,30 @@ pipeline {
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-                        sh '''
-                        mkdir -p /tmp/docker
 
-                        cat > /tmp/docker/config.json <<EOF
+                        sh '''
+                        mkdir -p /kaniko/.docker
+
+                        cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
-      "username": "${DOCKER_USER}",
-      "password": "${DOCKER_PASS}"
+      "username": "$DOCKER_USER",
+      "password": "$DOCKER_PASS"
     }
   }
 }
 EOF
 
-                        export DOCKER_CONFIG=/tmp/docker
+                        echo "===== DOCKER CONFIG ====="
+                        cat /kaniko/.docker/config.json
 
                         /kaniko/executor \
+                          --verbosity=debug \
+                          --snapshot-mode=redo \
                           --context=$WORKSPACE/order-service \
                           --dockerfile=$WORKSPACE/order-service/Dockerfile \
-                          --destination=somil7/order-service:latest \
-                          --verbosity=debug
+                          --destination=$DOCKERHUB_USERNAME/order-service:latest
                         '''
                     }
                 }
@@ -54,106 +83,19 @@ EOF
 
         stage('Build & Push Payment Service') {
             steps {
-                container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                        sh '''
-                        mkdir -p /tmp/docker
-
-                        cat > /tmp/docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "${DOCKER_USER}",
-      "password": "${DOCKER_PASS}"
-    }
-  }
-}
-EOF
-
-                        export DOCKER_CONFIG=/tmp/docker
-
-                        /kaniko/executor \
-                          --context=$WORKSPACE/payment-service \
-                          --dockerfile=$WORKSPACE/payment-service/Dockerfile \
-                          --destination=somil7/payment-service:latest \
-                          --verbosity=debug
-                        '''
-                    }
-                }
+                echo "Skipping for now"
             }
         }
 
         stage('Build & Push Product Service') {
             steps {
-                container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                        sh '''
-                        mkdir -p /tmp/docker
-
-                        cat > /tmp/docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "${DOCKER_USER}",
-      "password": "${DOCKER_PASS}"
-    }
-  }
-}
-EOF
-
-                        export DOCKER_CONFIG=/tmp/docker
-
-                        /kaniko/executor \
-                          --context=$WORKSPACE/product-service \
-                          --dockerfile=$WORKSPACE/product-service/Dockerfile \
-                          --destination=somil7/product-service:latest \
-                          --verbosity=debug
-                        '''
-                    }
-                }
+                echo "Skipping for now"
             }
         }
 
         stage('Build & Push User Service') {
             steps {
-                container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                        sh '''
-                        mkdir -p /tmp/docker
-
-                        cat > /tmp/docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "${DOCKER_USER}",
-      "password": "${DOCKER_PASS}"
-    }
-  }
-}
-EOF
-
-                        export DOCKER_CONFIG=/tmp/docker
-
-                        /kaniko/executor \
-                          --context=$WORKSPACE/user-service \
-                          --dockerfile=$WORKSPACE/user-service/Dockerfile \
-                          --destination=somil7/user-service:latest \
-                          --verbosity=debug
-                        '''
-                    }
-                }
+                echo "Skipping for now"
             }
         }
     }
