@@ -167,10 +167,14 @@ EOF
 
                 echo "===== UPDATED FILES ====="
 
-                cat k8s/order/deployment.yaml
-                cat k8s/payment/deployment.yaml
-                cat k8s/product/deployment.yaml
-                cat k8s/user/deployment.yaml
+git config user.email "jenkins@cloudcart.local"
+git config user.name "Jenkins"
+
+git add .
+
+git commit -m "Update images to build ${BUILD_NUMBER}" || echo "Nothing to commit"
+
+git push origin main
                 '''
             }
         }
