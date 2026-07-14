@@ -58,7 +58,7 @@ EOF
                     )]) {
 
                         sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
+cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
@@ -69,11 +69,20 @@ EOF
 }
 EOF
 
-                        /kaniko/executor \
-                        --context=$WORKSPACE/payment-service \
-                        --dockerfile=$WORKSPACE/payment-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/payment-service:${BUILD_NUMBER}
-                        '''
+echo "===== PAYMENT CONTEXT ====="
+pwd
+ls -la
+ls -la $WORKSPACE/payment-service
+cat $WORKSPACE/payment-service/package.json
+
+echo "===== BUILDING IMAGE ====="
+
+/kaniko/executor \
+--verbosity=debug \
+--context=$WORKSPACE/payment-service \
+--dockerfile=$WORKSPACE/payment-service/Dockerfile \
+--destination=$DOCKERHUB_USERNAME/payment-service:${BUILD_NUMBER}
+'''
                     }
                 }
             }
