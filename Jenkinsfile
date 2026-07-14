@@ -39,6 +39,7 @@ pipeline {
 EOF
 
                         /kaniko/executor \
+                        --cache=false \
                         --context=$WORKSPACE/order-service \
                         --dockerfile=$WORKSPACE/order-service/Dockerfile \
                         --destination=$DOCKERHUB_USERNAME/order-service:${BUILD_NUMBER}
@@ -78,6 +79,7 @@ cat $WORKSPACE/payment-service/package.json
 echo "===== BUILDING IMAGE ====="
 
 /kaniko/executor \
+--cache=false \
 --verbosity=debug \
 --context=$WORKSPACE/payment-service \
 --dockerfile=$WORKSPACE/payment-service/Dockerfile \
@@ -110,6 +112,7 @@ echo "===== BUILDING IMAGE ====="
 EOF
 
                         /kaniko/executor \
+                        --cache=false \
                         --context=$WORKSPACE/product-service \
                         --dockerfile=$WORKSPACE/product-service/Dockerfile \
                         --destination=$DOCKERHUB_USERNAME/product-service:${BUILD_NUMBER}
@@ -141,6 +144,7 @@ EOF
 EOF
 
                         /kaniko/executor \
+                        --cache=false \
                         --context=$WORKSPACE/user-service \
                         --dockerfile=$WORKSPACE/user-service/Dockerfile \
                         --destination=$DOCKERHUB_USERNAME/user-service:${BUILD_NUMBER}
