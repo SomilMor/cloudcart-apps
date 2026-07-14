@@ -17,9 +17,7 @@ pipeline {
             steps {
                 container('kaniko') {
                     sh '''
-                    echo "===== GIT COMMIT ====="
-                    git rev-parse HEAD
-
+                    
                     echo "===== WORKSPACE ====="
                     pwd
 
