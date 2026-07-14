@@ -140,5 +140,41 @@ EOF
                 }
             }
         }
+    
+    stage('Update Manifests') {
+    steps {
+        container('jnlp') {
+            withCredentials([usernamePassword(
+                credentialsId: 'github',
+                usernameVariable: 'GIT_USER',
+                passwordVariable: 'GIT_TOKEN'
+            )]) {
+
+                sh '''
+                rm -rf manifests
+
+                git clone https://$GIT_USER:$GIT_TOKEN@github.com/SomilMor/cloudcart-manifests.git manifests
+
+                cd manifests
+
+                sed -i "s|image: somil7/order-service:.*|image: somil7/order-service:${BUILD_NUMBER}|g" k8s/order/deployment.yaml
+
+                sed -i "s|image: somil7/payment-service:.*|image: somil7/payment-service:${BUILD_NUMBER}|g" k8s/payment/deployment.yaml
+
+                sed -i "s|image: somil7/product-service:.*|image: somil7/product-service:${BUILD_NUMBER}|g" k8s/product/deployment.yaml
+
+                sed -i "s|image: somil7/user-service:.*|image: somil7/user-service:${BUILD_NUMBER}|g" k8s/user/deployment.yaml
+
+                echo "===== UPDATED FILES ====="
+
+                cat k8s/order/deployment.yaml
+                cat k8s/payment/deployment.yaml
+                cat k8s/product/deployment.yaml
+                cat k8s/user/deployment.yaml
+                '''
+            }
+        }
     }
+}
+}
 }
