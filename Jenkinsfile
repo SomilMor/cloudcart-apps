@@ -5,10 +5,6 @@ pipeline {
         }
     }
 
-    environment {
-        DOCKERHUB_USERNAME = "somil7"
-    }
-
     stages {
 
         stage('Checkout') {
@@ -17,167 +13,37 @@ pipeline {
             }
         }
 
-        stage('Build & Push Order Service') {
+        stage('Payment Debug') {
             steps {
                 container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
+                    sh '''
+                    echo "===== GIT COMMIT ====="
+                    git rev-parse HEAD
 
-                        sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "$DOCKER_USER",
-      "password": "$DOCKER_PASS"
-    }
-  }
-}
-EOF
+                    echo "===== WORKSPACE ====="
+                    pwd
 
-                        /kaniko/executor \
-                        --cache=false \
-                        --context=$WORKSPACE/order-service \
-                        --dockerfile=$WORKSPACE/order-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/order-service:${BUILD_NUMBER}
-                        '''
-                    }
+                    echo "===== PAYMENT FILES ====="
+                    ls -la $WORKSPACE/payment-service
+
+                    echo "===== DOCKERFILE ====="
+                    cat $WORKSPACE/payment-service/Dockerfile
+
+                    echo "===== PACKAGE.JSON ====="
+                    cat $WORKSPACE/payment-service/package.json
+
+                    echo "===== DOCKERIGNORE ====="
+                    if [ -f $WORKSPACE/payment-service/.dockerignore ]; then
+                      cat $WORKSPACE/payment-service/.dockerignore
+                    else
+                      echo "NO .dockerignore"
+                    fi
+
+                    echo "===== NODE_MODULES ====="
+                    find $WORKSPACE/payment-service/node_modules | head -20
+                    '''
                 }
             }
         }
-
-       stage('Build & Push Payment Service') {
-    steps {
-        container('kaniko') {
-            sh '''
-            echo "===== WORKSPACE ====="
-            pwd
-
-            echo "===== PAYMENT SERVICE ====="
-            ls -la $WORKSPACE/payment-service
-
-            echo "===== PACKAGE.JSON ====="
-            cat $WORKSPACE/payment-service/package.json
-
-            echo "===== PACKAGE-LOCK ====="
-            head -20 $WORKSPACE/payment-service/package-lock.json
-
-            echo "===== GIT STATUS ====="
-            git status
-
-            echo "===== FIND PAYMENT ====="
-            find $WORKSPACE/payment-service -maxdepth 2
-            '''
-        }
     }
-
-        }
-
-        stage('Build & Push Product Service') {
-            steps {
-                container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-
-                        sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "$DOCKER_USER",
-      "password": "$DOCKER_PASS"
-    }
-  }
-}
-EOF
-
-                        /kaniko/executor \
-                        --cache=false \
-                        --context=$WORKSPACE/product-service \
-                        --dockerfile=$WORKSPACE/product-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/product-service:${BUILD_NUMBER}
-                        '''
-                    }
-                }
-            }
-        }
-
-        stage('Build & Push User Service') {
-            steps {
-                container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-
-                        sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "$DOCKER_USER",
-      "password": "$DOCKER_PASS"
-    }
-  }
-}
-EOF
-
-                        /kaniko/executor \
-                        --cache=false \
-                        --context=$WORKSPACE/user-service \
-                        --dockerfile=$WORKSPACE/user-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/user-service:${BUILD_NUMBER}
-                        '''
-                    }
-                }
-            }
-        }
-    
-    stage('Update Manifests') {
-    steps {
-        container('jnlp') {
-            withCredentials([usernamePassword(
-                credentialsId: 'github',
-                usernameVariable: 'GIT_USER',
-                passwordVariable: 'GIT_TOKEN'
-            )]) {
-
-                sh '''
-                rm -rf manifests
-
-                git clone https://$GIT_USER:$GIT_TOKEN@github.com/SomilMor/cloudcart-manifests.git manifests
-
-                cd manifests
-
-                sed -i "s|image: somil7/order-service:.*|image: somil7/order-service:${BUILD_NUMBER}|g" k8s/order/deployment.yaml
-
-                sed -i "s|image: somil7/payment-service:.*|image: somil7/payment-service:${BUILD_NUMBER}|g" k8s/payment/deployment.yaml
-
-                sed -i "s|image: somil7/product-service:.*|image: somil7/product-service:${BUILD_NUMBER}|g" k8s/product/deployment.yaml
-
-                sed -i "s|image: somil7/user-service:.*|image: somil7/user-service:${BUILD_NUMBER}|g" k8s/user/deployment.yaml
-
-                echo "===== UPDATED FILES ====="
-
-git config user.email "jenkins@cloudcart.local"
-git config user.name "Jenkins"
-
-git add .
-
-git commit -m "Update images to build ${BUILD_NUMBER}" || echo "Nothing to commit"
-
-git push origin main
-                '''
-            }
-        }
-    }
-}
-}
 }
