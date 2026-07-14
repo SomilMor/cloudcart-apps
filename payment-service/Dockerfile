@@ -1,14 +1,17 @@
-FROM node:18-alpine
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install && ls -la node_modules && ls node_modules | head -20
+RUN npm ci
 
 COPY . .
 
-RUN ls -la node_modules && ls node_modules | head -20
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app .
 
 EXPOSE 3000
 

@@ -49,45 +49,31 @@ EOF
             }
         }
 
-        stage('Build & Push Payment Service') {
-            steps {
-                container('kaniko') {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
+       stage('Build & Push Payment Service') {
+    steps {
+        container('kaniko') {
+            sh '''
+            echo "===== WORKSPACE ====="
+            pwd
 
-                        sh '''
-cat > /kaniko/.docker/config.json <<EOF
-{
-  "auths": {
-    "https://index.docker.io/v1/": {
-      "username": "$DOCKER_USER",
-      "password": "$DOCKER_PASS"
+            echo "===== PAYMENT SERVICE ====="
+            ls -la $WORKSPACE/payment-service
+
+            echo "===== PACKAGE.JSON ====="
+            cat $WORKSPACE/payment-service/package.json
+
+            echo "===== PACKAGE-LOCK ====="
+            head -20 $WORKSPACE/payment-service/package-lock.json
+
+            echo "===== GIT STATUS ====="
+            git status
+
+            echo "===== FIND PAYMENT ====="
+            find $WORKSPACE/payment-service -maxdepth 2
+            '''
+        }
     }
-  }
-}
-EOF
 
-echo "===== PAYMENT CONTEXT ====="
-pwd
-ls -la
-ls -la $WORKSPACE/payment-service
-cat $WORKSPACE/payment-service/package.json
-
-echo "===== BUILDING IMAGE ====="
-
-/kaniko/executor \
---cache=false \
---verbosity=debug \
---context=$WORKSPACE/payment-service \
---dockerfile=$WORKSPACE/payment-service/Dockerfile \
---destination=$DOCKERHUB_USERNAME/payment-service:${BUILD_NUMBER}
-'''
-                    }
-                }
-            }
         }
 
         stage('Build & Push Product Service') {
