@@ -136,7 +136,16 @@ EOF
                 }
             }
         }
-
+        
+stage('Verify Trivy') {
+    steps {
+        container('trivy') {
+            sh '''
+            trivy --version
+            '''
+        }
+    }
+}
         stage('Update Manifests') {
             steps {
                 container('jnlp') {
