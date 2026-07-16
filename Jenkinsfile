@@ -25,9 +25,8 @@ pipeline {
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-
                         sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
+cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
@@ -38,11 +37,11 @@ pipeline {
 }
 EOF
 
-                        /kaniko/executor \
-                        --context=$WORKSPACE/order-service \
-                        --dockerfile=$WORKSPACE/order-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/order-${BUILD_NUMBER}
-                        '''
+/kaniko/executor \
+  --context=$WORKSPACE/order-service \
+  --dockerfile=$WORKSPACE/order-service/Dockerfile \
+  --destination=$DOCKERHUB_USERNAME/order-service:${BUILD_NUMBER}
+'''
                     }
                 }
             }
@@ -56,9 +55,8 @@ EOF
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-
                         sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
+cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
@@ -69,11 +67,11 @@ EOF
 }
 EOF
 
-                        /kaniko/executor \
-                        --context=$WORKSPACE/payment-service \
-                        --dockerfile=$WORKSPACE/payment-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/payment-${BUILD_NUMBER}
-                        '''
+/kaniko/executor \
+  --context=$WORKSPACE/payment-service \
+  --dockerfile=$WORKSPACE/payment-service/Dockerfile \
+  --destination=$DOCKERHUB_USERNAME/payment-service:${BUILD_NUMBER}
+'''
                     }
                 }
             }
@@ -87,9 +85,8 @@ EOF
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-
                         sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
+cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
@@ -100,11 +97,11 @@ EOF
 }
 EOF
 
-                        /kaniko/executor \
-                        --context=$WORKSPACE/product-service \
-                        --dockerfile=$WORKSPACE/product-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/product-${BUILD_NUMBER}
-                        '''
+/kaniko/executor \
+  --context=$WORKSPACE/product-service \
+  --dockerfile=$WORKSPACE/product-service/Dockerfile \
+  --destination=$DOCKERHUB_USERNAME/product-service:${BUILD_NUMBER}
+'''
                     }
                 }
             }
@@ -118,9 +115,8 @@ EOF
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-
                         sh '''
-                        cat > /kaniko/.docker/config.json <<EOF
+cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
@@ -131,49 +127,50 @@ EOF
 }
 EOF
 
-                        /kaniko/executor \
-                        --context=$WORKSPACE/user-service \
-                        --dockerfile=$WORKSPACE/user-service/Dockerfile \
-                        --destination=$DOCKERHUB_USERNAME/user-${BUILD_NUMBER}
-                        '''
+/kaniko/executor \
+  --context=$WORKSPACE/user-service \
+  --dockerfile=$WORKSPACE/user-service/Dockerfile \
+  --destination=$DOCKERHUB_USERNAME/user-service:${BUILD_NUMBER}
+'''
                     }
                 }
             }
         }
-    
-    stage('Update Manifests') {
-    steps {
-        container('jnlp') {
-            withCredentials([usernamePassword(
-                credentialsId: 'github',
-                usernameVariable: 'GIT_USER',
-                passwordVariable: 'GIT_TOKEN'
-            )]) {
 
-                sh '''
-                rm -rf manifests
+        stage('Update Manifests') {
+            steps {
+                container('jnlp') {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'github',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_TOKEN'
+                    )]) {
 
-                git clone https://$GIT_USER:$GIT_TOKEN@github.com/SomilMor/cloudcart-manifests.git manifests
+                        sh '''
+rm -rf manifests
 
-                cd manifests
+git clone https://$GIT_USER:$GIT_TOKEN@github.com/SomilMor/cloudcart-manifests.git manifests
 
-                sed -i "s|image: somil7/order-service:.*|image: somil7/order-service:${BUILD_NUMBER}|g" k8s/order/deployment.yaml
+cd manifests
 
-                sed -i "s|image: somil7/payment-service:.*|image: somil7/payment-service:${BUILD_NUMBER}|g" k8s/payment/deployment.yaml
+git config user.email "jenkins@cloudcart.com"
+git config user.name "Jenkins"
 
-                sed -i "s|image: somil7/product-service:.*|image: somil7/product-service:${BUILD_NUMBER}|g" k8s/product/deployment.yaml
+sed -i "s|image: somil7/order-service:.*|image: somil7/order-service:${BUILD_NUMBER}|g" k8s/order/deployment.yaml
+sed -i "s|image: somil7/payment-service:.*|image: somil7/payment-service:${BUILD_NUMBER}|g" k8s/payment/deployment.yaml
+sed -i "s|image: somil7/product-service:.*|image: somil7/product-service:${BUILD_NUMBER}|g" k8s/product/deployment.yaml
+sed -i "s|image: somil7/user-service:.*|image: somil7/user-service:${BUILD_NUMBER}|g" k8s/user/deployment.yaml
 
-                sed -i "s|image: somil7/user-service:.*|image: somil7/user-service:${BUILD_NUMBER}|g" k8s/user/deployment.yaml
+git add .
 
-                echo "===== UPDATED FILES ====="
+git commit -m "Update images to build ${BUILD_NUMBER}" || true
 
-                cat k8s/order/deployment.yaml
-                cat k8s/payment/deployment.yaml
-                cat k8s/product/deployment.yaml
-                cat k8s/user/deployment.yaml
-                '''
+git push origin main
+'''
+                    }
+                }
             }
         }
+
     }
-}
 }
