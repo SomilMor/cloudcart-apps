@@ -136,14 +136,36 @@ EOF
                 }
             }
         }
-        
-stage('Verify Trivy') {
+
+stage('Trivy Scan') {
     steps {
         container('trivy') {
             sh '''
-            trivy --version
+            mkdir -p reports
+
+            trivy image --severity HIGH,CRITICAL \
+              -f table \
+              -o reports/order.txt \
+              somil7/order-service:${BUILD_NUMBER}
+
+            trivy image --severity HIGH,CRITICAL \
+              -f table \
+              -o reports/payment.txt \
+              somil7/payment-service:${BUILD_NUMBER}
+
+            trivy image --severity HIGH,CRITICAL \
+              -f table \
+              -o reports/product.txt \
+              somil7/product-service:${BUILD_NUMBER}
+
+            trivy image --severity HIGH,CRITICAL \
+              -f table \
+              -o reports/user.txt \
+              somil7/user-service:${BUILD_NUMBER}
             '''
         }
+
+        archiveArtifacts artifacts: 'reports/*.txt', fingerprint: true
     }
 }
         stage('Update Manifests') {
