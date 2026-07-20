@@ -148,20 +148,28 @@ stage('Trivy Scan') {
               -o reports/order.txt \
               somil7/order-service:${BUILD_NUMBER}
 
+              cat reports/order.txt
+
             trivy image --severity HIGH,CRITICAL \
               -f table \
               -o reports/payment.txt \
               somil7/payment-service:${BUILD_NUMBER}
+
+              cat reports/payment.txt
 
             trivy image --severity HIGH,CRITICAL \
               -f table \
               -o reports/product.txt \
               somil7/product-service:${BUILD_NUMBER}
 
+              cat reports/product.txt
+
             trivy image --severity HIGH,CRITICAL \
               -f table \
               -o reports/user.txt \
               somil7/user-service:${BUILD_NUMBER}
+
+              cat reports/user.txt
             '''
         }
 
