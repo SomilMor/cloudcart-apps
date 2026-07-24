@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Payment Service Running - version 3");
+  res.send("Payment Service Running");
 });
 
 app.get("/payments", (req, res) => {
