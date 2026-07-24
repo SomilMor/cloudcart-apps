@@ -1,4 +1,4 @@
-\# CloudCart — Production-Style DevOps Platform on AWS EKS
+# CloudCart — Production-Style DevOps Platform on AWS EKS
 
 
 
@@ -10,15 +10,15 @@ The project deploys four containerized Node.js microservices to an Amazon EKS Ku
 
 
 
-The primary focus of this project is the \*\*DevOps architecture and deployment lifecycle\*\* rather than application complexity.
+The primary focus of this project is the **DevOps architecture and deployment lifecycle** rather than application complexity.
 
 
 
-\---
+---
 
 
 
-\## Architecture Overview
+## Architecture Overview
 
 
 
@@ -26,61 +26,61 @@ The primary focus of this project is the \*\*DevOps architecture and deployment 
 
 Developer
 
-&#x20;   |
+       |
 
-&#x20;   v
+       v
 
 GitHub - cloudcart-apps
 
-&#x20;   |
+       |
 
-&#x20;   v
+       v
 
 Jenkins CI Pipeline
 
-&#x20;   |
+       |
 
-&#x20;   +---- Build container images with Kaniko
+       +---- Build container images with Kaniko
 
-&#x20;   |
+       |
 
-&#x20;   +---- Push images to Docker Hub
+       +---- Push images to Docker Hub
 
-&#x20;   |
+       |
 
-&#x20;   +---- Scan images with Trivy
+       +---- Scan images with Trivy
 
-&#x20;   |
+       |
 
-&#x20;   v
+       v
 
 GitHub - cloudcart-manifests
 
-&#x20;   |
+       |
 
-&#x20;   v
+       v
 
 Argo CD
 
-&#x20;   |
+       |
 
-&#x20;   v
+       v
 
 Amazon EKS
 
-&#x20;   |
+       |
 
-&#x20;   +---- NGINX Ingress
+       +---- NGINX Ingress
 
-&#x20;   |
+       |
 
-&#x20;   +---- User Service
+       +---- User Service
 
-&#x20;   +---- Product Service
+       +---- Product Service
 
-&#x20;   +---- Order Service
+       +---- Order Service
 
-&#x20;   +---- Payment Service
+       +---- Payment Service
 
 
 
@@ -100,11 +100,11 @@ Application Pods ----> Promtail ----> Loki ----> Grafana
 
 
 
-\---
+---
 
 
 
-\## Tech Stack
+## Tech Stack
 
 
 
@@ -142,11 +142,11 @@ Application Pods ----> Promtail ----> Loki ----> Grafana
 
 
 
-\---
+---
 
 
 
-\## Microservices
+## Microservices
 
 
 
@@ -176,11 +176,11 @@ The services are intentionally simple because the project focuses on the infrast
 
 
 
-\---
+---
 
 
 
-\## CI/CD Pipeline with Jenkins
+## CI/CD Pipeline with Jenkins
 
 
 
@@ -192,31 +192,31 @@ The pipeline performs the following operations:
 
 
 
-1\. Checks out the application source code.
+1. Checks out the application source code.
 
-2\. Builds images for all four microservices using Kaniko.
+2. Builds images for all four microservices using Kaniko.
 
-3\. Tags each image using the Jenkins build number.
+3. Tags each image using the Jenkins build number.
 
-4\. Pushes the container images to Docker Hub.
+4. Pushes the container images to Docker Hub.
 
-5\. Scans the images using Trivy.
+5. Scans the images using Trivy.
 
-6\. Generates and archives vulnerability reports.
+6. Generates and archives vulnerability reports.
 
-7\. Clones the separate `cloudcart-manifests` repository.
+7. Clones the separate `cloudcart-manifests` repository.
 
-8\. Updates the Kubernetes deployment image tags.
+8. Updates the Kubernetes deployment image tags.
 
-9\. Commits the new image versions to Git.
+9. Commits the new image versions to Git.
 
-10\. Pushes the updated manifests to GitHub.
+10. Pushes the updated manifests to GitHub.
 
-11\. Argo CD detects the desired-state change and synchronizes the EKS cluster.
+11. Argo CD detects the desired-state change and synchronizes the EKS cluster.
 
 
 
-This creates a separation between the \*\*CI process\*\* and the \*\*deployment process\*\*.
+This creates a separation between the **CI process** and the **deployment process**.
 
 
 
@@ -224,7 +224,7 @@ Jenkins produces and validates the application artifacts, while Argo CD is respo
 
 
 
-\### Successful Jenkins Pipeline
+### Successful Jenkins Pipeline
 
 
 
@@ -236,11 +236,11 @@ The screenshot above shows a successful Jenkins build updating all four image ta
 
 
 
-\---
+---
 
 
 
-\## Container Builds with Kaniko
+## Container Builds with Kaniko
 
 
 
@@ -248,7 +248,7 @@ The Jenkins agents run inside Kubernetes.
 
 
 
-Instead of requiring a Docker daemon inside the Jenkins build environment, container images are built using \*\*Kaniko\*\*.
+Instead of requiring a Docker daemon inside the Jenkins build environment, container images are built using **Kaniko**.
 
 
 
@@ -278,15 +278,15 @@ Using the Jenkins build number provides a unique image version for each pipeline
 
 
 
-\---
+---
 
 
 
-\## Container Security with Trivy
+## Container Security with Trivy
 
 
 
-Container images are scanned using \*\*Trivy\*\* as part of the Jenkins pipeline.
+Container images are scanned using **Trivy** as part of the Jenkins pipeline.
 
 
 
@@ -294,9 +294,9 @@ The pipeline checks each microservice image for:
 
 
 
-\- HIGH severity vulnerabilities
+- HIGH severity vulnerabilities
 
-\- CRITICAL severity vulnerabilities
+- CRITICAL severity vulnerabilities
 
 
 
@@ -304,13 +304,13 @@ Reports are generated for:
 
 
 
-\- `user-service`
+- `user-service`
 
-\- `product-service`
+- `product-service`
 
-\- `order-service`
+- `order-service`
 
-\- `payment-service`
+- `payment-service`
 
 
 
@@ -322,15 +322,15 @@ This integrates container vulnerability scanning directly into the CI workflow r
 
 
 
-\---
+---
 
 
 
-\## GitOps with Argo CD
+## GitOps with Argo CD
 
 
 
-Application deployment is managed through \*\*Argo CD\*\*.
+Application deployment is managed through **Argo CD**.
 
 
 
@@ -342,7 +342,7 @@ Instead, the deployment flow is:
 
 
 
-\*\*Jenkins → cloudcart-manifests → Argo CD → Amazon EKS\*\*
+**Jenkins → cloudcart-manifests → Argo CD → Amazon EKS**
 
 
 
@@ -358,7 +358,7 @@ When a change is detected, Argo CD synchronizes the Kubernetes resources.
 
 
 
-\### Argo CD Application
+### Argo CD Application
 
 
 
@@ -370,9 +370,9 @@ The CloudCart application is shown as:
 
 
 
-\- \*\*Healthy\*\*
+- **Healthy**
 
-\- \*\*Synced\*\*
+- **Synced**
 
 
 
@@ -380,15 +380,15 @@ This demonstrates that the resources running in EKS match the desired state stor
 
 
 
-\---
+---
 
 
 
-\## Amazon EKS
+## Amazon EKS
 
 
 
-CloudCart runs on \*\*Amazon Elastic Kubernetes Service (EKS)\*\*.
+CloudCart runs on **Amazon Elastic Kubernetes Service (EKS)**.
 
 
 
@@ -396,7 +396,7 @@ EKS provides the managed Kubernetes control plane while Kubernetes handles deplo
 
 
 
-\### EKS Cluster
+### EKS Cluster
 
 
 
@@ -412,23 +412,23 @@ Examples include:
 
 
 
-\- `default`
+- `default`
 
-\- `argocd`
+- `argocd`
 
-\- `jenkins`
+- `jenkins`
 
-\- `monitoring`
+- `monitoring`
 
-\- `logging`
+- `logging`
 
-\- `ingress-nginx`
+- `ingress-nginx`
 
-\- `kube-system`
+- `kube-system`
 
 
 
-\### Kubernetes Workloads
+### Kubernetes Workloads
 
 
 
@@ -440,11 +440,11 @@ The cluster runs the four CloudCart microservices alongside the supporting CI/CD
 
 
 
-\---
+---
 
 
 
-\## Kubernetes Networking
+## Kubernetes Networking
 
 
 
@@ -456,7 +456,7 @@ The application services use internal `ClusterIP` networking.
 
 
 
-External traffic enters the cluster through the \*\*NGINX Ingress Controller\*\*.
+External traffic enters the cluster through the **NGINX Ingress Controller**.
 
 
 
@@ -464,7 +464,7 @@ The networking model is therefore:
 
 
 
-\*\*Client → AWS Load Balancer → NGINX Ingress → Kubernetes Service → Application Pod\*\*
+**Client → AWS Load Balancer → NGINX Ingress → Kubernetes Service → Application Pod**
 
 
 
@@ -472,15 +472,15 @@ This avoids creating a separate external load balancer for every microservice an
 
 
 
-\---
+---
 
 
 
-\## Monitoring with Prometheus and Grafana
+## Monitoring with Prometheus and Grafana
 
 
 
-CloudCart includes cluster monitoring using \*\*Prometheus and Grafana\*\*.
+CloudCart includes cluster monitoring using **Prometheus and Grafana**.
 
 
 
@@ -492,25 +492,25 @@ The monitoring stack provides visibility into information such as:
 
 
 
-\- CPU utilization
+- CPU utilization
 
-\- Memory utilization
+- Memory utilization
 
-\- CPU requests
+- CPU requests
 
-\- CPU limits
+- CPU limits
 
-\- Memory requests
+- Memory requests
 
-\- Memory limits
+- Memory limits
 
-\- Namespace resource consumption
+- Namespace resource consumption
 
-\- Kubernetes workloads
+- Kubernetes workloads
 
 
 
-\### Grafana Kubernetes Dashboard
+### Grafana Kubernetes Dashboard
 
 
 
@@ -522,11 +522,11 @@ The dashboard provides visibility into resource consumption across namespaces su
 
 
 
-\---
+---
 
 
 
-\## Centralized Logging with Loki and Promtail
+## Centralized Logging with Loki and Promtail
 
 
 
@@ -538,11 +538,11 @@ The logging pipeline is:
 
 
 
-\*\*Application Pods → Promtail → Loki → Grafana\*\*
+**Application Pods → Promtail → Loki → Grafana**
 
 
 
-Promtail runs as a Kubernetes \*\*DaemonSet\*\*, allowing it to collect logs from pods running across the worker nodes.
+Promtail runs as a Kubernetes **DaemonSet**, allowing it to collect logs from pods running across the worker nodes.
 
 
 
@@ -554,17 +554,17 @@ Useful labels include:
 
 
 
-\- `app`
+- `app`
 
-\- `container`
+- `container`
 
-\- `namespace`
+- `namespace`
 
-\- `pod`
+- `pod`
 
-\- `node\_name`
+- `node\_name`
 
-\- `job`
+- `job`
 
 
 
@@ -572,7 +572,7 @@ Loki stores and indexes the log streams while Grafana provides an interface for 
 
 
 
-\### LogQL Example
+### LogQL Example
 
 
 
@@ -592,7 +592,7 @@ For example:
 
 
 
-\### Application Logs in Grafana
+### Application Logs in Grafana
 
 
 
@@ -608,11 +608,11 @@ This provides centralized visibility without requiring direct access to individu
 
 
 
-\---
+---
 
 
 
-\## Repository Structure
+## Repository Structure
 
 
 
@@ -712,11 +712,11 @@ The Kubernetes manifests used by the GitOps deployment workflow are maintained s
 
 
 
-\---
+---
 
 
 
-\## End-to-End Deployment Flow
+## End-to-End Deployment Flow
 
 
 
@@ -724,43 +724,43 @@ The complete deployment lifecycle works as follows:
 
 
 
-1\. A developer pushes application changes to GitHub.
+1. A developer pushes application changes to GitHub.
 
-2\. Jenkins checks out the latest source code.
+2. Jenkins checks out the latest source code.
 
-3\. Kaniko builds container images for the four microservices.
+3. Kaniko builds container images for the four microservices.
 
-4\. The images are pushed to Docker Hub with the Jenkins build number as the image tag.
+4. The images are pushed to Docker Hub with the Jenkins build number as the image tag.
 
-5\. Trivy scans the container images for HIGH and CRITICAL vulnerabilities.
+5. Trivy scans the container images for HIGH and CRITICAL vulnerabilities.
 
-6\. Jenkins clones the `cloudcart-manifests` repository.
+6. Jenkins clones the `cloudcart-manifests` repository.
 
-7\. Jenkins updates the Kubernetes deployment manifests with the new image versions.
+7. Jenkins updates the Kubernetes deployment manifests with the new image versions.
 
-8\. The updated manifests are committed and pushed to GitHub.
+8. The updated manifests are committed and pushed to GitHub.
 
-9\. Argo CD detects the Git repository change.
+9. Argo CD detects the Git repository change.
 
-10\. Argo CD synchronizes the desired state with Amazon EKS.
+10. Argo CD synchronizes the desired state with Amazon EKS.
 
-11\. Kubernetes rolls out the updated application containers.
+11. Kubernetes rolls out the updated application containers.
 
-12\. NGINX Ingress routes incoming application traffic.
+12. NGINX Ingress routes incoming application traffic.
 
-13\. Prometheus collects Kubernetes metrics.
+13. Prometheus collects Kubernetes metrics.
 
-14\. Promtail collects pod logs and forwards them to Loki.
+14. Promtail collects pod logs and forwards them to Loki.
 
-15\. Grafana provides dashboards for metrics and centralized log exploration.
-
-
-
-\---
+15. Grafana provides dashboards for metrics and centralized log exploration.
 
 
 
-\## CI and GitOps Separation
+---
+
+
+
+## CI and GitOps Separation
 
 
 
@@ -768,7 +768,7 @@ An important architectural decision in this project is separating continuous int
 
 
 
-\### Continuous Integration
+### Continuous Integration
 
 
 
@@ -776,23 +776,23 @@ Jenkins handles:
 
 
 
-\- Source checkout
+- Source checkout
 
-\- Container image builds
+- Container image builds
 
-\- Image versioning
+- Image versioning
 
-\- Docker Hub pushes
+- Docker Hub pushes
 
-\- Trivy security scanning
+- Trivy security scanning
 
-\- Security report archiving
+- Security report archiving
 
-\- GitOps manifest updates
+- GitOps manifest updates
 
 
 
-\### Continuous Deployment
+### Continuous Deployment
 
 
 
@@ -800,13 +800,13 @@ Argo CD handles:
 
 
 
-\- Watching the manifests repository
+- Watching the manifests repository
 
-\- Detecting desired-state changes
+- Detecting desired-state changes
 
-\- Synchronizing Kubernetes resources
+- Synchronizing Kubernetes resources
 
-\- Maintaining the Git-defined cluster state
+- Maintaining the Git-defined cluster state
 
 
 
@@ -818,11 +818,11 @@ Git acts as the source of truth for application deployment state.
 
 
 
-\---
+---
 
 
 
-\## Observability Architecture
+## Observability Architecture
 
 
 
@@ -830,11 +830,11 @@ CloudCart uses separate pipelines for metrics and logs.
 
 
 
-\### Metrics
+### Metrics
 
 
 
-\*\*Kubernetes → Prometheus → Grafana\*\*
+**Kubernetes → Prometheus → Grafana**
 
 
 
@@ -842,11 +842,11 @@ Prometheus collects metrics from the Kubernetes environment and Grafana provides
 
 
 
-\### Logs
+### Logs
 
 
 
-\*\*Kubernetes Pods → Promtail → Loki → Grafana\*\*
+**Kubernetes Pods → Promtail → Loki → Grafana**
 
 
 
@@ -858,11 +858,11 @@ Together, these provide visibility into both infrastructure behavior and applica
 
 
 
-\---
+---
 
 
 
-\## Key DevOps Concepts Demonstrated
+## Key DevOps Concepts Demonstrated
 
 
 
@@ -870,53 +870,53 @@ This project demonstrates practical experience with:
 
 
 
-\- AWS cloud infrastructure
+- AWS cloud infrastructure
 
-\- Amazon EKS
+- Amazon EKS
 
-\- Kubernetes deployments and services
+- Kubernetes deployments and services
 
-\- Kubernetes namespaces
+- Kubernetes namespaces
 
-\- Kubernetes ingress
+- Kubernetes ingress
 
-\- Docker containerization
+- Docker containerization
 
-\- Kaniko container builds
+- Kaniko container builds
 
-\- Jenkins pipelines
+- Jenkins pipelines
 
-\- CI/CD automation
+- CI/CD automation
 
-\- GitOps
+- GitOps
 
-\- Argo CD
+- Argo CD
 
-\- Container vulnerability scanning
+- Container vulnerability scanning
 
-\- Trivy
+- Trivy
 
-\- Prometheus monitoring
+- Prometheus monitoring
 
-\- Grafana dashboards
+- Grafana dashboards
 
-\- Loki centralized logging
+- Loki centralized logging
 
-\- Promtail DaemonSets
+- Promtail DaemonSets
 
-\- Helm deployments
+- Helm deployments
 
-\- Git-based infrastructure workflows
+- Git-based infrastructure workflows
 
-\- Multi-repository CI/CD architecture
-
-
-
-\---
+- Multi-repository CI/CD architecture
 
 
 
-\## Project Status
+---
+
+
+
+## Project Status
 
 
 
@@ -924,7 +924,7 @@ The complete DevOps workflow is operational:
 
 
 
-\*\*GitHub → Jenkins → Kaniko → Trivy → Docker Hub → GitOps Repository → Argo CD → Amazon EKS\*\*
+**GitHub → Jenkins → Kaniko → Trivy → Docker Hub → GitOps Repository → Argo CD → Amazon EKS**
 
 
 
@@ -932,7 +932,7 @@ Observability is provided through:
 
 
 
-\*\*Prometheus → Grafana\*\*
+**Prometheus → Grafana**
 
 
 
@@ -940,7 +940,7 @@ and:
 
 
 
-\*\*Promtail → Loki → Grafana\*\*
+**Promtail → Loki → Grafana**
 
 
 
@@ -948,43 +948,43 @@ The project currently demonstrates:
 
 
 
-\- Four containerized microservices
+- Four containerized microservices
 
-\- Kubernetes deployment on AWS EKS
+- Kubernetes deployment on AWS EKS
 
-\- Automated Jenkins CI
+- Automated Jenkins CI
 
-\- Kaniko-based image builds
+- Kaniko-based image builds
 
-\- Automated image versioning
+- Automated image versioning
 
-\- Container security scanning
+- Container security scanning
 
-\- Separate GitOps manifests repository
+- Separate GitOps manifests repository
 
-\- Argo CD continuous deployment
+- Argo CD continuous deployment
 
-\- NGINX ingress
+- NGINX ingress
 
-\- Prometheus monitoring
+- Prometheus monitoring
 
-\- Grafana dashboards
+- Grafana dashboards
 
-\- Loki centralized logging
+- Loki centralized logging
 
-\- Promtail Kubernetes log collection
-
-
-
-\---
+- Promtail Kubernetes log collection
 
 
 
-\## Author
+---
 
 
 
-\*\*Somil Mor\*\*
+## Author
+
+
+
+**Somil Mor**
 
 
 
@@ -994,5 +994,5 @@ DevOps and Cloud Enthusiast
 
 
 
-\*\*Core Technologies:\*\* AWS, Linux, Docker, Kubernetes, Jenkins, Argo CD, Git, GitHub, Prometheus, Grafana, Loki and Terraform
+**Core Technologies:** AWS, Linux, Docker, Kubernetes, Jenkins, Argo CD, Git, GitHub, Prometheus, Grafana, Loki and Terraform
 
